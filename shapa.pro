@@ -4,15 +4,17 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui opengl
 
 TARGET = shapa
 TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        MainWindow.cpp
+        MainWindow.cpp \
+    GLView.cpp
 
-HEADERS  += MainWindow.h
+HEADERS  += MainWindow.h \
+    GLView.h
 
 FORMS    += MainWindow.ui

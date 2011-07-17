@@ -6,46 +6,95 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>538</width>
-    <height>443</height>
+    <width>571</width>
+    <height>449</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>522</width>
-      <height>394</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QTextEdit" name="vertexShader"/>
-       </item>
-       <item>
-        <widget class="QTextEdit" name="fragmentShader"/>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <widget class="QTextBrowser" name="textBrowser"/>
-     </item>
-    </layout>
-   </widget>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="sizeConstraint">
+       <enum>QLayout::SetNoConstraint</enum>
+      </property>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0,1">
+        <property name="spacing">
+         <number>-1</number>
+        </property>
+        <property name="sizeConstraint">
+         <enum>QLayout::SetNoConstraint</enum>
+        </property>
+        <item>
+         <widget class="QPlainTextEdit" name="vertexShader">
+          <property name="plainText">
+           <string>void main()
+{
+	gl_Position=gl_Vertex;
+}</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPlainTextEdit" name="fragmentShader">
+          <property name="plainText">
+           <string>void main()
+{
+	float x,y,x2,y2;
+	x=gl_FragCoord.x/800.;y=gl_FragCoord.y/600.;
+	float it=0.;
+	/*for(int i=0;i&lt;128;++i)*/
+	{
+		it=x*255.;/*
+		x2=x*x;
+		y2=y*y;
+		if(it==0)&amp;&amp;(x2+y2)&gt;BOUND)
+			it=i;
+		y=2*x*y+cy;
+		x=x2-y2+cx;*/
+	}
+	gl_FragColor = vec4(it/255.);
+}</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QTextBrowser" name="errorLog"/>
+      </item>
+     </layout>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>538</width>
+     <width>571</width>
      <height>20</height>
     </rect>
    </property>
