@@ -10,6 +10,7 @@ int main(int argc, char *argv[])
     w.show();
 
 	GLView gl;
+	gl.resize(800,600);
 	gl.show();
 
 	gl.connect(&w, SIGNAL(willClose()), SLOT(close()));
