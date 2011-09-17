@@ -1,8 +1,10 @@
 #include "GLView.h"
 
 GLView::GLView(QWidget *parent) :
-    QGLWidget(parent)
+	QGLWidget(parent),
+	_timer(this)
 {
+	connect(&_timer, SIGNAL(timeout()),SLOT(update()));
 }
 
 void GLView::initializeGL()
@@ -52,11 +54,15 @@ void GLView::Relink()
 	}
 
 	glUseProgram(_shader_program);
+
+	_timer.start(1000/30);
+	_etimer.restart();
 	update();
 }
 
 void GLView::UpdateVertexShader(QString shader)
 {
+	_timer.stop();
 	char* error = Compile(shader, _vertex_shader);
 	if (error)
 	{
@@ -71,6 +77,7 @@ void GLView::UpdateVertexShader(QString shader)
 
 void GLView::UpdateFragmentShader(QString shader)
 {
+	_timer.stop();
 	char* error = Compile(shader, _fragment_shader);
 	if (error)
 	{
@@ -92,10 +99,13 @@ void GLView::resizeGL(int width, int height)
 void GLView::paintGL()
 {
 	//qDebug("YGLScreen::paintGL()");
-	glBegin(GL_QUADS);
+/*	glBegin(GL_QUADS);
 	glVertex2f(-1., -1.);
 	glVertex2f(-1, 1.);
 	glVertex2f(1., 1.);
 	glVertex2f(1., -1.);
 	glEnd();
+	*/
+	float t = 1.+_etimer.elapsed()/4096.;
+	glRectf(t,t,-t,-t);
 }

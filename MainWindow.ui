@@ -37,32 +37,22 @@
         <item>
          <widget class="QPlainTextEdit" name="vertexShader">
           <property name="plainText">
-           <string>void main()
+           <string>varying vec4 p;
+void main()
 {
-	gl_Position=gl_Vertex;
-}</string>
+p=gl_Position=gl_Vertex; p.z=length(p.xy);
+}
+</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QPlainTextEdit" name="fragmentShader">
           <property name="plainText">
-           <string>void main()
+           <string>varying vec4 p;
+void main()
 {
-	float x,y,x2,y2;
-	x=gl_FragCoord.x/800.;y=gl_FragCoord.y/600.;
-	float it=0.;
-	/*for(int i=0;i&lt;128;++i)*/
-	{
-		it=x*255.;/*
-		x2=x*x;
-		y2=y*y;
-		if(it==0)&amp;&amp;(x2+y2)&gt;BOUND)
-			it=i;
-		y=2*x*y+cy;
-		x=x2-y2+cx;*/
-	}
-	gl_FragColor = vec4(it/255.);
+gl_FragColor = abs(p*sin(4.*p.x)*sin(4.*p.y));
 }</string>
           </property>
          </widget>

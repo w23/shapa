@@ -32,6 +32,8 @@ signals:
 private:
 	int _vertex_shader, _fragment_shader;
 	int _shader_program;
+	QElapsedTimer _etimer;
+        QTimer _timer;
 };
 
 #endif // GLVIEW_H
