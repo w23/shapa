@@ -20,7 +20,8 @@ void GLView::initializeGL()
 
 char* GLView::Compile(const QString& src, int shader)
 {
-	const char* psrc = src.toLatin1().constData();
+        QByteArray bar = src.toLatin1();
+        const char* psrc = bar.constData();
 	glShaderSource(shader, 1, &psrc, NULL);
 	glCompileShader(shader);
 
@@ -32,8 +33,8 @@ char* GLView::Compile(const QString& src, int shader)
 		char* buf = new char[result];
 		glGetShaderInfoLog(shader, result, 0, buf);
 		return buf;
-	}
-	return 0;
+        }
+        return 0;
 }
 
 void GLView::Relink()
@@ -70,7 +71,10 @@ void GLView::UpdateVertexShader(QString shader)
 		emit VertexShaderError(QString(error));
 		delete[] error;
 		return;
-	}
+        } else {
+            qDebug("OK");
+            emit VertexShaderError(QString("OK"));
+        }
 
 	Relink();
 }
