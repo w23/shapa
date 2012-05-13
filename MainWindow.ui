@@ -20,19 +20,34 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <property name="sizeConstraint">
-       <enum>QLayout::SetNoConstraint</enum>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="margin">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="minimumSize">
+       <size>
+        <width>500</width>
+        <height>200</height>
+       </size>
       </property>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="tabVtx">
+       <attribute name="title">
+        <string>vertex shader</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
         <property name="spacing">
-         <number>-1</number>
+         <number>0</number>
         </property>
-        <property name="sizeConstraint">
-         <enum>QLayout::SetNoConstraint</enum>
+        <property name="margin">
+         <number>0</number>
         </property>
         <item>
          <widget class="QPlainTextEdit" name="vertexShader">
@@ -46,6 +61,19 @@ p=gl_Position=gl_Vertex; p.z=length(p.xy);
           </property>
          </widget>
         </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tabFrg">
+       <attribute name="title">
+        <string>fragment shader</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="margin">
+         <number>0</number>
+        </property>
         <item>
          <widget class="QPlainTextEdit" name="fragmentShader">
           <property name="plainText">
@@ -58,11 +86,30 @@ gl_FragColor = abs(p*sin(4.*p.x)*sin(4.*p.y));
          </widget>
         </item>
        </layout>
-      </item>
-      <item>
-       <widget class="QTextBrowser" name="errorLog"/>
-      </item>
-     </layout>
+      </widget>
+     </widget>
+    </item>
+    <item>
+     <widget class="QTextBrowser" name="errorLog">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>200</height>
+       </size>
+      </property>
+      <property name="sizeIncrement">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -84,7 +131,6 @@ gl_FragColor = abs(p*sin(4.*p.x)*sin(4.*p.y));
     <bool>false</bool>
    </attribute>
   </widget>
-  <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

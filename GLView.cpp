@@ -20,8 +20,8 @@ void GLView::initializeGL()
 
 char* GLView::Compile(const QString& src, int shader)
 {
-        QByteArray bar = src.toLatin1();
-        const char* psrc = bar.constData();
+	QByteArray bar = src.toLatin1();
+	const char* psrc = bar.constData();
 	glShaderSource(shader, 1, &psrc, NULL);
 	glCompileShader(shader);
 
@@ -48,7 +48,7 @@ void GLView::Relink()
 		glGetProgramiv(_shader_program, GL_INFO_LOG_LENGTH, &result);
 		char* buf = new char[result];
 		glGetProgramInfoLog(_shader_program, result, 0, buf);
-		qDebug(buf);
+//		qDebug(buf);
 		emit LinkProgramError(QString(buf));
 		delete[] buf;
 		return;
@@ -67,7 +67,7 @@ void GLView::UpdateVertexShader(QString shader)
 	char* error = Compile(shader, _vertex_shader);
 	if (error)
 	{
-		qDebug(error);
+//		qDebug(error);
 		emit VertexShaderError(QString(error));
 		delete[] error;
 		return;
@@ -85,7 +85,7 @@ void GLView::UpdateFragmentShader(QString shader)
 	char* error = Compile(shader, _fragment_shader);
 	if (error)
 	{
-		qDebug(error);
+//		qDebug(error);
 		emit FragmentShaderError(QString(error));
 		delete[] error;
 		return;
@@ -102,14 +102,6 @@ void GLView::resizeGL(int width, int height)
 
 void GLView::paintGL()
 {
-	//qDebug("YGLScreen::paintGL()");
-/*	glBegin(GL_QUADS);
-	glVertex2f(-1., -1.);
-	glVertex2f(-1, 1.);
-	glVertex2f(1., 1.);
-	glVertex2f(1., -1.);
-	glEnd();
-	*/
-	float t = 1.+_etimer.elapsed()/4096.;
+	float t = 1.+_etimer.elapsed()/1000.;
 	glRectf(t,t,-t,-t);
 }
