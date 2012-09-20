@@ -16,6 +16,7 @@ int main(int argc, char *argv[])
 	gl.connect(&w, SIGNAL(willClose()), SLOT(close()));
 	gl.connect(&w, SIGNAL(vertexShader(QString)), SLOT(UpdateVertexShader(QString)));
 	gl.connect(&w, SIGNAL(fragmentShader(QString)), SLOT(UpdateFragmentShader(QString)));
+    gl.connect(&w, SIGNAL(resumeRendering(bool)), SLOT(ResumeRendering(bool)));
 	w.connect(&gl, SIGNAL(VertexShaderError(QString)), SLOT(showError(QString)));
 	w.connect(&gl, SIGNAL(FragmentShaderError(QString)), SLOT(showError(QString)));
 	w.connect(&gl, SIGNAL(LinkProgramError(QString)), SLOT(showError(QString)));

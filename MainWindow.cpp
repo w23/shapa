@@ -17,6 +17,7 @@ void MainWindow::emitState()
 {
 	emit vertexShader(ui->vertexShader->toPlainText());
 	emit fragmentShader(ui->fragmentShader->toPlainText());
+    emit resumeRendering(ui->checkBox->checkState()==Qt::Checked);
 }
 
 void MainWindow::closeEvent(QCloseEvent *e)
@@ -39,4 +40,9 @@ void MainWindow::on_vertexShader_textChanged()
 void MainWindow::on_fragmentShader_textChanged()
 {
 	emit fragmentShader(ui->fragmentShader->toPlainText());
+}
+
+void MainWindow::on_checkBox_toggled(bool checked)
+{
+    emit resumeRendering(checked);
 }

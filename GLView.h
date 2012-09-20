@@ -19,6 +19,7 @@ protected:
 public slots:
 	void UpdateVertexShader(QString shader);
 	void UpdateFragmentShader(QString shader);
+    void ResumeRendering(bool resume);
 
 private:
 	char* Compile(const QString& src, int shader);
@@ -34,6 +35,7 @@ private:
 	int _shader_program;
 	QElapsedTimer _etimer;
         QTimer _timer;
+    bool _active;
 };
 
 #endif // GLVIEW_H

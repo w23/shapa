@@ -2,7 +2,8 @@
 
 GLView::GLView(QWidget *parent) :
 	QGLWidget(parent),
-	_timer(this)
+    _timer(this),
+    _active(false)
 {
 	connect(&_timer, SIGNAL(timeout()),SLOT(update()));
 }
@@ -56,9 +57,9 @@ void GLView::Relink()
 
 	glUseProgram(_shader_program);
 
-	_timer.start(1000/30);
-	_etimer.restart();
-	update();
+    emit LinkProgramError(QString("K"));
+
+    ResumeRendering(_active);
 }
 
 void GLView::UpdateVertexShader(QString shader)
@@ -104,4 +105,18 @@ void GLView::paintGL()
 {
 	float t = 1.+_etimer.elapsed()/1000.;
 	glRectf(t,t,-t,-t);
+}
+
+void GLView::ResumeRendering(bool resume)
+{
+    _active = resume;
+
+    if (_active)
+    {
+        _timer.start(1000/30);
+        _etimer.restart();
+        update();
+    }
+    else
+        _timer.stop();
 }
