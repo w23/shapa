@@ -1,6 +1,4 @@
-#ifndef GLVIEW_H
-#define GLVIEW_H
-
+#pragma once
 #define GL_GLEXT_PROTOTYPES
 #include <QtOpenGL>
 
@@ -22,7 +20,6 @@ public slots:
     void ResumeRendering(bool resume);
 
 private:
-	char* Compile(const QString& src, int shader);
 	void Relink();
 
 signals:
@@ -31,11 +28,11 @@ signals:
 	void LinkProgramError(QString error);
 
 private:
-	int _vertex_shader, _fragment_shader;
-	int _shader_program;
-	QElapsedTimer _etimer;
-        QTimer _timer;
+    QElapsedTimer _etimer;
+    QTimer _timer;
     bool _active;
+    QOpenGLBuffer *quadGeometry_;
+    QOpenGLShader *vertexShader_, *fragmentShader_;
+    QOpenGLShaderProgram *shaderProgram_;
+    static const float s_quad_geometry[8];
 };
-
-#endif // GLVIEW_H

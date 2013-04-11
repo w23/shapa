@@ -1,9 +1,14 @@
 #include "GLView.h"
 
+const float GLView::s_quad_geometry[8] = {
+    1.f, -1.f, 1.f, 1.f, -1.f, -1.f, -1.f, 1.f
+};
+
 GLView::GLView(QWidget *parent) :
 	QGLWidget(parent),
     _timer(this),
-    _active(false)
+    _active(false),
+    quadGeometry_(0), vertexShader_(0), fragmentShader_(0)
 {
 	connect(&_timer, SIGNAL(timeout()),SLOT(update()));
 }
@@ -12,87 +17,54 @@ void GLView::initializeGL()
 {
 	qDebug("YGLScreen::initializeGL()");
 
-	_vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-	_fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-	_shader_program = glCreateProgram();
-	glAttachShader(_shader_program, _vertex_shader);
-	glAttachShader(_shader_program, _fragment_shader);
+    GLuint vao;
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+    quadGeometry_ = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
+    vertexShader_ = new QOpenGLShader(QOpenGLShader::Vertex);
+    fragmentShader_ = new QOpenGLShader(QOpenGLShader::Fragment);
+    shaderProgram_ = new QOpenGLShaderProgram();
+
+    quadGeometry_->setUsagePattern(QOpenGLBuffer::StaticDraw);
+    quadGeometry_->create();
+    quadGeometry_->bind();
+    quadGeometry_->allocate(s_quad_geometry, sizeof(s_quad_geometry));
 }
 
-char* GLView::Compile(const QString& src, int shader)
-{
-	QByteArray bar = src.toLatin1();
-	const char* psrc = bar.constData();
-	glShaderSource(shader, 1, &psrc, NULL);
-	glCompileShader(shader);
-
-	int result;
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &result);
-	if (result != GL_TRUE)
-	{
-		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &result);
-		char* buf = new char[result];
-		glGetShaderInfoLog(shader, result, 0, buf);
-		return buf;
-        }
-        return 0;
-}
-
-void GLView::Relink()
-{
-	glLinkProgram(_shader_program);
-
-	int result;
-	glGetProgramiv(_shader_program, GL_LINK_STATUS, &result);
-	if (result != GL_TRUE)
-	{
-		glGetProgramiv(_shader_program, GL_INFO_LOG_LENGTH, &result);
-		char* buf = new char[result];
-		glGetProgramInfoLog(_shader_program, result, 0, buf);
-//		qDebug(buf);
-		emit LinkProgramError(QString(buf));
-		delete[] buf;
-		return;
-	}
-
-	glUseProgram(_shader_program);
-
+void GLView::Relink() {
+    shaderProgram_->removeAllShaders();
+    shaderProgram_->addShader(vertexShader_);
+    shaderProgram_->addShader(fragmentShader_);
+    if (!shaderProgram_->link()) {
+        emit LinkProgramError(shaderProgram_->log());
+        return;
+    }
     emit LinkProgramError(QString("K"));
-
+    shaderProgram_->bind();
+    shaderProgram_->setAttributeBuffer("vertex", GL_FLOAT, 0, 2);
+    shaderProgram_->enableAttributeArray("vertex");
     ResumeRendering(_active);
 }
 
-void GLView::UpdateVertexShader(QString shader)
-{
-	_timer.stop();
-	char* error = Compile(shader, _vertex_shader);
-	if (error)
-	{
-//		qDebug(error);
-		emit VertexShaderError(QString(error));
-		delete[] error;
-		return;
-        } else {
-            qDebug("OK");
-            emit VertexShaderError(QString("OK"));
-        }
-
+void GLView::UpdateVertexShader(QString shader) {
+    _timer.stop();
+    if (!vertexShader_->compileSourceCode(shader)) {
+        emit VertexShaderError(vertexShader_->log());
+        return;
+    }
+    emit VertexShaderError(QString("OK"));
 	Relink();
 }
 
-void GLView::UpdateFragmentShader(QString shader)
-{
-	_timer.stop();
-	char* error = Compile(shader, _fragment_shader);
-	if (error)
-	{
-//		qDebug(error);
-		emit FragmentShaderError(QString(error));
-		delete[] error;
-		return;
-	}
-
-	Relink();
+void GLView::UpdateFragmentShader(QString shader) {
+    _timer.stop();
+    if (!fragmentShader_->compileSourceCode(shader)) {
+        emit FragmentShaderError(fragmentShader_->log());
+        return;
+    }
+    emit FragmentShaderError(QString("OK"));
+    Relink();
 }
 
 void GLView::resizeGL(int width, int height)
@@ -103,8 +75,9 @@ void GLView::resizeGL(int width, int height)
 
 void GLView::paintGL()
 {
-	float t = 1.+_etimer.elapsed()/1000.;
-	glRectf(t,t,-t,-t);
+    float t = 1.f + _etimer.elapsed() / 1000.f;
+    shaderProgram_->setUniformValue(shaderProgram_->uniformLocation("g_time"), t);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
 void GLView::ResumeRendering(bool resume)

@@ -1,4 +1,4 @@
-#include <QtGui/QApplication>
+#include <QtGui>
 #include "MainWindow.h"
 #include "GLView.h"
 
@@ -9,8 +9,13 @@ int main(int argc, char *argv[])
 	MainWindow w;
     w.show();
 
+    QGLFormat glfmt;
+    glfmt.setVersion(3, 2);
+    glfmt.setProfile(QGLFormat::CoreProfile);
+    QGLFormat::setDefaultFormat(glfmt);
+
 	GLView gl;
-	gl.resize(800,600);
+    gl.resize(640, 360);
 	gl.show();
 
 	gl.connect(&w, SIGNAL(willClose()), SLOT(close()));
