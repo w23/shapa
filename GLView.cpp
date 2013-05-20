@@ -25,6 +25,8 @@ void GLView::initializeGL()
     vertexShader_ = new QOpenGLShader(QOpenGLShader::Vertex);
     fragmentShader_ = new QOpenGLShader(QOpenGLShader::Fragment);
     shaderProgram_ = new QOpenGLShaderProgram();
+    shaderProgram_->addShader(vertexShader_);
+    shaderProgram_->addShader(fragmentShader_);
 
     quadGeometry_->setUsagePattern(QOpenGLBuffer::StaticDraw);
     quadGeometry_->create();
@@ -33,9 +35,6 @@ void GLView::initializeGL()
 }
 
 void GLView::Relink() {
-    shaderProgram_->removeAllShaders();
-    shaderProgram_->addShader(vertexShader_);
-    shaderProgram_->addShader(fragmentShader_);
     if (!shaderProgram_->link()) {
         emit LinkProgramError(shaderProgram_->log());
         return;
