@@ -1,43 +1,43 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
-
+#pragma once
 #include <QMainWindow>
 
 namespace Ui {
     class MainWindow;
 }
 
-class MainWindow : public QMainWindow
-{
-    Q_OBJECT
-
+class CProgram;
+class GLView;
+class MainWindow : public QMainWindow {
+  Q_OBJECT
 public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
-
-	void emitState();
+  explicit MainWindow(QWidget *parent = 0);
+  ~MainWindow();
 
 signals:
-	void willClose();
-	void vertexShader(QString vs);
-	void fragmentShader(QString fs);
-    void resumeRendering(bool resume);
+  void resumeRendering(bool resume);
 
 protected:
-	void closeEvent(QCloseEvent *);
+  void closeEvent(QCloseEvent *);
 
 public slots:
-	void showError(QString error);
+  void showShaderError(QString error);
+  void menuOpenNew();
+  void menuSave();
 
 private slots:
-	void on_vertexShader_textChanged();
-
-	void on_fragmentShader_textChanged();
-
-    void on_checkBox_toggled(bool checked);
+  void on_vertexShader_textChanged();
+  void on_fragmentShader_textChanged();
+  void on_runBox_toggled(bool checked);
 
 private:
-    Ui::MainWindow *ui;
-};
+  void setupProgram();
+  bool saveProgram();
+  bool closeProgram();
 
-#endif // MAINWINDOW_H
+private:
+  Ui::MainWindow *ui;
+
+  QString file_;
+  CProgram *program_;
+  GLView *glview_;
+};
