@@ -18,7 +18,7 @@ GLView::GLView(CProgram *program, QWidget *parent) :
 }
 
 void GLView::initializeGL() {
-  qDebug(QString("glver: %1").arg(QGLFormat::openGLVersionFlags(), 8, 16).toLocal8Bit());
+  //qDebug(QString("glver: %1").arg(QGLFormat::openGLVersionFlags(), 8, 16).toLocal8Bit());
 
   /*GLuint vao;
   glGenVertexArrays(1, &vao);
@@ -87,7 +87,7 @@ void GLView::ResumeRendering(bool resume) {
   _active = resume;
 
   if (_active) {
-    _timer.start(1000/30);
+    _timer.start(0.f);//1000.f/60.f);
     _etimer.restart();
     update();
   } else

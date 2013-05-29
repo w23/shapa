@@ -16,8 +16,8 @@ signals:
   void vertexShaderChanged(QString source);
 
 public slots:
-  void loadFromFile(QString filename);
-  void saveToFile(QString filename);
+  bool loadFromFile(QString filename);
+  bool saveToFile(QString filename);
   void updateVertexShader(QString source);
   void updateFragmentShader(QString source);
     

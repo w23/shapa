@@ -10,6 +10,14 @@ MainWindow::MainWindow(QWidget *parent) :
     program_(0)
 {
     ui->setupUi(this);
+    QFont monospace("Monospace");
+    monospace.setStyleHint(QFont::TypeWriter);
+    ui->fragmentShader->setFont(monospace);
+    ui->vertexShader->setFont(monospace);
+    ui->errorLog->setFont(monospace);
+
+    if (QApplication::arguments().size() > 1)
+      openProgram(QApplication::arguments().at(1));
 }
 
 MainWindow::~MainWindow() {
@@ -19,8 +27,8 @@ MainWindow::~MainWindow() {
 
 void MainWindow::closeEvent(QCloseEvent *e)
 {
-  closeProgram();
-  return QMainWindow::closeEvent(e);
+  if (!closeProgram()) e->ignore();
+  else QMainWindow::closeEvent(e);
 }
 
 void MainWindow::showShaderError(QString error) {
@@ -41,44 +49,86 @@ void MainWindow::on_runBox_toggled(bool checked) {
 
 void MainWindow::menuOpenNew() {
   if (closeProgram()) {
-    delete program_;
-    program_ = new CProgram();
-    setupProgram();
+    filename_ = QString();
+    setupProgram(new CProgram());
+  }
+}
+
+void MainWindow::menuOpen() {
+  if (closeProgram()) {
+    QFileDialog dialog(this, "Open shader");
+    dialog.setFileMode(QFileDialog::ExistingFile);
+    dialog.setNameFilter("XML Shaders (*.xml)");
+    if (!dialog.exec()) return;
+    openProgram(dialog.selectedFiles().first());
   }
 }
 
 void MainWindow::menuSave() {
-  saveProgram();
+  saveProgram(filename_);
 }
 
-void MainWindow::setupProgram() {
-  glview_ = new GLView(program_);
+void MainWindow::openProgram(QString filename) {
+  CProgram *program = new CProgram();
+  connect(program, SIGNAL(error(QString)),
+          this, SLOT(showErrorMessage(QString)));
+  if (!program->loadFromFile(filename)) {
+    delete program;
+    return;
+  }
+  filename_ = filename;
+  setupProgram(program);
+}
+
+void MainWindow::setupProgram(CProgram *program) {
+  glview_ = new GLView(program);
   glview_->resize(640, 360);
   glview_->show();
+
+  ui->fragmentShader->setPlainText(program->getFragmentShader());
+  ui->fragmentShader->setEnabled(true);
+  ui->vertexShader->setPlainText(program->getVertexShader());
+  ui->vertexShader->setEnabled(true);
+  ui->runBox->setEnabled(true);
+
   connect(this, SIGNAL(resumeRendering(bool)), glview_, SLOT(ResumeRendering(bool)));
   connect(glview_, SIGNAL(VertexShaderError(QString)), SLOT(showShaderError(QString)));
   connect(glview_, SIGNAL(FragmentShaderError(QString)), SLOT(showShaderError(QString)));
   connect(glview_, SIGNAL(LinkProgramError(QString)), SLOT(showShaderError(QString)));
 
-  ui->fragmentShader->setPlainText(program_->getFragmentShader());
-  ui->fragmentShader->setEnabled(true);
-  ui->vertexShader->setPlainText(program_->getVertexShader());
-  ui->vertexShader->setEnabled(true);
-  ui->runBox->setEnabled(true);
+  program_ = program;
   glview_->ResumeRendering(ui->runBox->checkState() == Qt::Checked);
 }
 
-bool MainWindow::saveProgram() {
-  if (program_) {
-    QMessageBox box;
-    box.setText("TODO SAVE");
-    box.exec();
+bool MainWindow::saveProgram(QString filename) {
+  if (!program_) return true;
+  if (filename.isEmpty())
+    filename = QFileDialog::getSaveFileName(this, "Save shader", QString(),
+                                         "XML Shaders (*.xml)");
+  if (program_->saveToFile(filename)) {
+    filename_ = filename;
+    return true;
   }
-  return true;
+  return false;
 }
 
 bool MainWindow::closeProgram() {
   if (!program_ || !glview_) return true;
+
+  if (program_->hasChanged()) {
+    switch (QMessageBox::question(this, "Save shader?",
+                                  "You have some changes here, dude!",
+                                  QMessageBox::StandardButtons(QMessageBox::Yes
+                                                               | QMessageBox::No
+                                                               | QMessageBox::Cancel),
+                                  QMessageBox::Cancel)) {
+    case QMessageBox::Cancel:
+      return false;
+    case QMessageBox::Yes:
+      saveProgram(filename_);
+    }
+  }
+
   ui->fragmentShader->setEnabled(false);
   ui->vertexShader->setEnabled(false);
   ui->runBox->setEnabled(false);
@@ -86,4 +136,8 @@ bool MainWindow::closeProgram() {
   delete glview_; glview_ = 0;
   delete program_; program_ = 0;
   return true;
+}
+
+void MainWindow::showErrorMessage(QString error) {
+  QMessageBox::critical(this, "Error!11", error);
 }
