@@ -10,11 +10,17 @@ MainWindow::MainWindow(QWidget *parent) :
     program_(0)
 {
     ui->setupUi(this);
-    QFont monospace("Monospace");
-    monospace.setStyleHint(QFont::TypeWriter);
+    QFont monospace("Monospace", 8);
+    monospace.setStyleHint(QFont::Monospace);
+    monospace.setFixedPitch(true);
     ui->fragmentShader->setFont(monospace);
     ui->vertexShader->setFont(monospace);
     ui->errorLog->setFont(monospace);
+
+    QFontMetrics metric(monospace);
+    const int tab_width = metric.width("  ");
+    ui->fragmentShader->setTabStopWidth(tab_width);
+    ui->vertexShader->setTabStopWidth(tab_width);
 
     if (QApplication::arguments().size() > 1)
       openProgram(QApplication::arguments().at(1));
@@ -126,6 +132,7 @@ bool MainWindow::closeProgram() {
       return false;
     case QMessageBox::Yes:
       saveProgram(filename_);
+    default: {}
     }
   }
 
