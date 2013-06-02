@@ -89,7 +89,7 @@ void GLView::ResumeRendering(bool resume) {
   if (_active) {
     _timer.start(0.f);//1000.f/60.f);
     _etimer.restart();
-    update();
   } else
     _timer.stop();
+  update();
 }
