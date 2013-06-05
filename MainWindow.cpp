@@ -3,6 +3,7 @@
 #include "ui_MainWindow.h"
 #include "CProgram.h"
 #include "GLView.h"
+#include "GLSLSyntaxHighlighter.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -21,6 +22,9 @@ MainWindow::MainWindow(QWidget *parent) :
     const int tab_width = metric.width("  ");
     ui->fragmentShader->setTabStopWidth(tab_width);
     ui->vertexShader->setTabStopWidth(tab_width);
+
+    fragmentHighlighter_ = new GLSLSyntaxHighlighter(ui->fragmentShader->document());
+    vertexHighlighter_ = new GLSLSyntaxHighlighter(ui->vertexShader->document());
 
     if (QApplication::arguments().size() > 1)
       openProgram(QApplication::arguments().at(1));

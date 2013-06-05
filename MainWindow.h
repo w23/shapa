@@ -7,6 +7,7 @@ namespace Ui {
 
 class CProgram;
 class GLView;
+class GLSLSyntaxHighlighter;
 class MainWindow : public QMainWindow {
   Q_OBJECT
 public:
@@ -39,6 +40,9 @@ private:
 
 private:
   Ui::MainWindow *ui;
+
+  GLSLSyntaxHighlighter *fragmentHighlighter_;
+  GLSLSyntaxHighlighter *vertexHighlighter_;
 
   QString filename_;
   CProgram *program_;
