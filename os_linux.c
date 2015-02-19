@@ -1,10 +1,14 @@
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <sys/inotify.h>
 #include <unistd.h>
+#include <string.h>
+#include <limits.h>
 #include "common.h"
 
 static struct timespec start = { 0, 0 };
@@ -50,4 +54,59 @@ int file_read(struct file_t *file, const char *filename) {
   file->size = rd;
   close(fd);
   return 1;
+}
+
+struct filemon_t_ {
+  int ifd;
+  int watch;
+  char filename[1];
+};
+
+filemon_t filemon_create(const char *filename) {
+  const size_t size = sizeof(struct filemon_t_) + strlen(filename);
+  struct filemon_t_ *f = malloc(size);
+  CHECK(f != NULL, "malloc");
+  strcpy(f->filename, filename);
+  f->ifd = inotify_init1(IN_NONBLOCK);
+  CHECK(f->ifd != -1, "inotify_init1");
+  f->watch = inotify_add_watch(f->ifd, f->filename,
+    IN_MODIFY | IN_DELETE_SELF | IN_MOVE_SELF);
+  return f;
+}
+
+int filemon_changed(filemon_t fin) {
+  char buffer[sizeof(struct inotify_event) + NAME_MAX + 1];
+  const struct inotify_event *e = (const struct inotify_event*)buffer;
+  struct filemon_t_ *f = (struct filemon_t_*)(fin);
+  int retval = 0;
+  if (f->watch == -1) {
+    f->watch = inotify_add_watch(f->ifd, f->filename,
+      IN_MODIFY | IN_DELETE_SELF | IN_MOVE_SELF);
+    return (f->watch == -1) ? 0 : 1;
+  }
+
+  for (;;) {
+    ssize_t rd = read(f->ifd, buffer, sizeof(buffer));
+    if (rd == -1) {
+      CHECK(errno == EAGAIN, "read inotify fd, errno != EAGAIN");
+      break;
+    }
+
+    retval = 1;
+
+    if (e->mask & (IN_IGNORED | IN_DELETE_SELF | IN_MOVE_SELF)) {
+      if (e->mask & IN_MOVE_SELF) inotify_rm_watch(f->ifd, f->watch);
+      f->watch = -1;
+      retval = 0;
+    }
+  }
+
+  return retval;
+}
+
+void filemon_close(filemon_t fin) {
+  struct filemon_t_ *f = (struct filemon_t_*)(fin);
+  if (f->watch != -1) inotify_rm_watch(f->ifd, f->watch);
+  close(f->ifd);
+  free(f);
 }

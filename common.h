@@ -12,6 +12,11 @@ struct file_t {
 };
 int file_read(struct file_t *file, const char *filename);
 
+typedef void *filemon_t;
+filemon_t filemon_create(const char *filename);
+int filemon_changed(filemon_t);
+void filemon_close(filemon_t);
+
 void os_open_window();
 int os_window_process();
 void os_window_blit();
