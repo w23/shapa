@@ -1,3 +1,5 @@
+#define COUNTOF(v) (sizeof(v)/sizeof(*v))
+
 #define CHECK(cond, errmsg) if (!(cond)) report_n_abort(__FILE__, __LINE__, errmsg);
 
 void report_n_abort(const char *file, int line, const char *message);
@@ -25,7 +27,7 @@ void os_close_window();
 struct shader_t {
   int program;
   int fragment;
-  int utime, uresolution;
+  int utime, uresolution, ufeedback;
 };
 
 const char *shader_get_last_error(int *last_error_size);
