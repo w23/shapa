@@ -1,6 +1,4 @@
-#define GL_GLEXT_PROTOTYPES 1
-#include <GL/gl.h>
-#include <GL/glext.h>
+#include "glutils.h"
 #include "common.h"
 
 static const float vertices[] = { 1.f, -3.f, 1.f, 1.f, -3.f, 1.f };
@@ -54,6 +52,7 @@ void shader_init() {
 }
 
 void shader_resize(int new_width, int new_height) {
+  if (new_width < 16 || new_height < 16) return;
   int i;
   width = new_width;
   height = new_height;
@@ -81,7 +80,7 @@ void shader_paint(const struct shader_t *shader, float time) {
   glBindTexture(GL_TEXTURE_2D, textures[tsrc]);
   glUseProgram(shader->program);
   if (shader->utime != -1) glUniform1f(shader->utime, time);
-  if (shader->uresolution != -1) glUniform2f(shader->uresolution, twidth, theight);
+  if (shader->uresolution != -1) glUniform2f(shader->uresolution, (float)twidth, (float)theight);
   if (shader->ufeedback != -1) glUniform1i(shader->ufeedback, 0);
   glDrawArrays(GL_TRIANGLES, 0, 3);
 
@@ -92,7 +91,7 @@ void shader_paint(const struct shader_t *shader, float time) {
   glBindTexture(GL_TEXTURE_2D, textures[tsrc]);
   glUseProgram(blitter.program);
   if (blitter.utime != -1) glUniform1f(blitter.utime, time);
-  if (blitter.uresolution != -1) glUniform2f(blitter.uresolution, width, height);
+  if (blitter.uresolution != -1) glUniform2f(blitter.uresolution, (float)width, (float)height);
   glUniform1i(blitter.ufeedback, 0);
   glDrawArrays(GL_TRIANGLES, 0, 3);
 }
@@ -130,4 +129,3 @@ void shader_destroy(struct shader_t *shader) {
   shader->program = 0;
   shader->fragment = 0;
 }
-

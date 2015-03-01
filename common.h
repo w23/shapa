@@ -6,8 +6,6 @@ void report_n_abort(const char *file, int line, const char *message);
 
 #define REASONABLE_SIZE 65536
 
-float os_time();
-
 struct file_t {
   int size;
   char text[REASONABLE_SIZE];
@@ -18,11 +16,6 @@ typedef void *filemon_t;
 filemon_t filemon_create(const char *filename);
 int filemon_changed(filemon_t);
 void filemon_close(filemon_t);
-
-void os_open_window();
-int os_window_process();
-void os_window_blit();
-void os_close_window();
 
 struct shader_t {
   int program;
@@ -37,3 +30,6 @@ void shader_paint(const struct shader_t *shader, float time);
 int shader_create(struct shader_t *shader, const char *source, int size);
 void shader_destroy(struct shader_t *shader);
 
+void shapa_init(int argc, char *argv[]);
+void shapa_process(float time);
+void shapa_deinit();
